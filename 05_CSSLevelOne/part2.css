@@ -1,0 +1,21 @@
+body{
+    /* background-color: gray; */
+    background: url(https://images.unsplash.com/photo-1553095066-5014bc7b7f2d?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8d2FsbCUyMGJhY2tncm91bmR8ZW58MHx8MHx8&w=1000&q=80);
+    background-repeat: no-repeat;
+}
+
+div{
+    background-color: blue;
+    border-color:orange;
+    border-width: 4px;
+    border-style: double ;
+}
+
+p{
+    color: yellow;
+}
+
+span{
+    background: red;
+    color: black;
+}

@@ -1,0 +1,311 @@
+1_Create a New Django Project: "ProTwo":
+cmd:
+    django-admin startproject ProTwo
+
+
+###########################################
+
+2_Create a New Django App: "AppTwo"
+cmd:
+    python manage.py startapp AppTwo
+
+in Project ProTwo settings.py:
+add "AppTwo" to the instaled apps list
+
+
+###########################################
+
+3_Create an Index View that returns:
+<em>My Second App</em>
+
+in views.py:
+
+from django.http import HttpResponse
+# Create your views here.
+def index(request):
+    return HttpResponse("<em>My Second App</em>")
+
+#############################################
+
+
+4_Link this view to the urls.py file
+
+in urls.py:
+
+from django.contrib import admin
+from django.urls import path, re_path
+from AppTwo import views
+
+urlpatterns = [
+    re_path('^$', views.index, name="Home"),
+    path("admin/", admin.site.urls),
+]
+
+
+################################################
+
+5_run the server:
+
+cmd:
+    python manage.py runserver
+
+
+################################################
+
+mapping urls with urls.py in app folder:
+
+1 - create a urls.py in the app folder => the views stay in this file
+
+    from django.urls import re_path
+    from appFour import views
+
+    urlpatterns = [
+        re_path(r'^$', views.index, name="index"),
+    ]
+
+
+2 - in the project urls.py ==> connect to the app urls.py with include()
+
+    from django.urls import include, re_path
+    urlpatterns = [...
+        re_path(r'^first_app/', include('first_app.urls')),
+        ...
+    ]
+
+
+################################################
+################################################
+
+
+TEMPLATES
+
+1 - Create folder templates in main project 
+    and subfolder for each app
+
+2 - go to settings.py:
+
+    create variable TEMPLATE_DIR with the paht to templates folder:
+
+        TEMPLATES_DIR = BASE_DIR / "templates" 
+
+        in the TEMPLATES dictionary:
+            "DIRS": [TEMPLATE_DIR,],
+
+3 - in app.views:
+
+    from django.shortcuts import render
+
+    def index(request):
+
+        my_data = {"index_var": "Hello I am from appFour.views.py"}
+
+        return render(request, 'appFour/index.html', context=my_data)
+
+
+################################################
+################################################     
+
+Static files:
+
+1 - create a static folder and subfolders in main project
+
+2 - link folder to project settings.py:
+    STATIC_DIR = BASE_DIR / "static"
+    
+    in the end of file:
+        STATICFILES_DIRS = [
+        STATIC_DIR,
+        ]
+
+3 - inject into html:
+    begining of html:
+        {% load static %}
+
+    place to load static file:
+    ex:
+         <img src="{% static "images/Django.jpg" %}" alt="not loading image">
+         <link rel="stylesheet" href="{% static "css/style.css" %}">
+
+
+################################################
+################################################     
+
+
+MODELS:
+
+1 - Create the models in the app models.py
+
+class Topic(models.Model):
+    top_name = models.CharField(max_length=264, unique=True)
+
+    def __str__(self) -> str:
+        return self.top_name
+
+class Webpage(models.Model):
+    topic = models.ForeignKey(Topic, on_delete = models.DO_NOTHING)
+    name = models.CharField(max_length=264, unique=True)
+    url = models.URLField(unique=True)
+    
+    def __str__(self) -> str:
+        return self.name
+
+class AccessRecord(models.Model):
+    name = models.ForeignKey(Webpage, on_delete = models.DO_NOTHING)
+    date = models.DateField()
+
+    def __str__(self) -> str:
+        return str(self.date)    
+
+
+2 - create db
+cmd:
+    python manage.py migrate
+
+3 - register alteretions
+cmd:
+    python manage.py makemigrations "app" ex: first_app
+
+    if "No installed app with label..." go to project settings ans in the INSTALED_APPS add the app.
+
+4 - migrate again 
+cmd:
+    python manage.py migrate  
+
+5 - test 
+cmd:
+    python manage.py shell
+    (python is launched)
+    >>>from first_app.models import Topic (one of the tables)
+    >>>print(Topic.objects.all())
+    >>><QuerySet []> (nothing in the table)
+    # create data
+    >>> t = Topic(top_name = "Social Network")
+    >>> t.save()
+
+6 - Go to first_app.admin.py and register the models:
+
+    from django.contrib import admin
+    from first_app.models import AccessRecord, Topic, Webpage
+
+    # Register your models here.
+    admin.site.register(AccessRecord)
+    admin.site.register(Topic)
+    admin.site.register(Webpage)
+
+7 - create superuser to limit access to data:
+cmd:
+    python manage.py createsuperuser
+    provide:
+        username
+        email
+        password
+
+    Enter the Webpage/admin and access the data
+
+####################################################
+####################################################
+
+
+8 - Create dummy data to populate the models
+
+cmd:
+    pip install Faker
+
+9 - create a populate script:
+
+    create a file in top level:
+    populate_first_app.py
+
+
+    import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'first_project.settings')
+
+import django
+
+django.setup()
+
+## FAKE POP SCRIPT
+import random
+from first_app.models import Topic, Webpage, AccessRecord
+from faker import Faker
+
+fakegen = Faker()
+
+
+## for Topic use a selections of topics
+
+topics = ['Search', 'Social', 'Marketplace', 'News', 'Games']
+def add_topic():
+    t = Topic.objects.get_or_create(top_name = random.choice(topics))[0]
+    t.save()
+    return t
+
+## for Webpage and AccessRecord use faker
+
+def populate(N=5):
+    for entry in range(N):
+
+        # get the topic for the entry
+        top = add_topic()
+
+        # create the fake data for that entry
+        fake_url = fakegen.url()
+        fake_date = fakegen.date()
+        fake_name = fakegen.company()
+
+        # Create the new webpage entry
+        webpg = Webpage.objects.get_or_create(topic = top, url = fake_url, name = fake_name)[0]
+
+        # create fake accessrecord entry
+        acc_rec = AccessRecord.objects.get_or_create(name = webpg, date = fake_date)[0]
+
+if __name__ == "__main__":
+    print("populating script!")
+    populate(20)
+    print("populating complete!")
+
+
+
+10 - run the file in shell
+cmd:
+    python populate_first_app.py
+
+then run server and verify the data
+    
+####################################################
+####################################################
+
+
+GET DATA FROM MODELS
+
+1 >> go to first_app views.py
+
+
+from first_app.models import Webpage, Topic, AccessRecord
+
+def index(request):
+
+    webpages_list= AccessRecord.objects.order_by('date')
+    date_dict = {"access_records": webpages_list}
+
+    return render(request, "first_app/index.html",context=date_dict)
+
+2 >> in index.html
+
+ <div class="djangtwo">
+        {% if access_records %}
+        <table>
+            <thead>
+                <th>Site Name</th>
+                <th>Date Accessed</th>
+            </thead>
+            {% for acc in access_records %}
+            <tr>
+                <td>{{ acc.name }}</td>
+                <td>{{ acc.date }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>NO Access records found</p>
+        {% endif %}

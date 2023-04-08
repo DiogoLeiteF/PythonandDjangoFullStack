@@ -1,0 +1,38 @@
+h1{
+    text-align: center;
+    font-family: 'East Sea Dokdo', cursive;
+    font-size: 60px;
+}
+
+table{
+    margin: auto;
+    text-align: center;
+}
+
+td{
+    height: 200px;
+    width: 150px;
+    border-radius: 20px;
+    border: 5px solid white;
+}
+
+#one {
+    background-color: #CDB4DB;
+}
+
+#two {
+    background-color: #FFC8DD;
+}
+
+#three {
+    background-color: #FFAFCC;
+}
+
+#four{
+    background-color: #BDE0FE;
+
+}
+
+#five {
+    background-color: #A2D2FF;
+}

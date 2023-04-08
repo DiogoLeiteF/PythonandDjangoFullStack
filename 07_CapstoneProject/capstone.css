@@ -1,0 +1,60 @@
+body{
+    font-family: "Arial";
+    color: white;
+    margin: 0%;
+}
+
+.main{
+    background-color: #032d47;
+    border-left: 40px solid aqua;
+    border-right: 40px solid aqua;
+    border-bottom: 50px solid aqua;
+
+
+    
+}
+
+h1{
+    margin: auto;
+    text-align: center;
+    padding: 20px;
+}
+
+h2{
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    
+}
+
+p{
+    width: 60%;
+    margin: auto;
+    text-align: center;
+    margin-top: 60px;
+}
+
+form{
+    margin: auto;
+    /* border: 2px solid red; */
+    text-align: center;
+}
+
+form p{
+    font-size: 0.7em;
+    margin-top: 10px;
+}
+
+input{
+    width: 25%;
+    height: 25px;
+}
+
+#submit{
+    width: 100px;
+    height: 50px;
+    background-color: rgb(255, 208, 0);
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
